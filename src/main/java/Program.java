@@ -1,9 +1,14 @@
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
@@ -124,18 +129,20 @@ public class Program{
 
     static String url = "jdbc:mysql://localhost/cinema";
     static String username = "root";
-    static String password = "";
+    static String password = "After1901";
 
     static int Hall_typesINT = 30;
     static int HallsINT = 30;
     static int GenresINT = 30;
     static int NewsreelsINT = 30;
     static int StatusesINT = 30;
+    static int filmINT = 1000;
+    static int StatusINT = 30;
 
-    static String[] Hall_typesString = new String[] {"3D", "IMAX", "KINO", "VIDEO", "4D", "5D"};
-    static String[] HallsString = new String[] {"Зал №1", "Зал №2", "Зал №3","Зал №4","Зал №5","Зал №6","Зал VIP"};
+    static String[] Hall_typesString = new String[] {"3D", "4D", "5D", "IMAX", "KINO", "VIDEO"};
+    static String[] HallsString = new String[] {"Hall №1", "Hall №2", "Hall №3","Hall №4","Hall №5","Hall №6","Hall VIP"};
     static String[] GenresString = new String[] {"Comedy","Drama","Shooter","War","Anime",
-            "Horror","Slasher","Documential","Fantasy","Fantastic",};
+            "Horror","Slasher","Documental","Fantasy","Fantastic",};
     static String[] NewsreelsString = new String[] {"Newsreel 1","Newsreel 2","Newsreel 3",
             "Newsreel 4","Newsreel 5",};
     static String[] StatusesString = new String[] {"Free", "Bought online", "Bought offline",
@@ -146,11 +153,11 @@ public class Program{
         try (Connection conn = DriverManager.getConnection(url, username, password)){
             Statement statement = conn.createStatement();
             statement.executeUpdate("SET NAMES 'utf8'");
-            generate(statement, Hall_types, "description", new SupplierMy(Hall_typesString), Hall_typesINT);
-            generate(statement, Halls, "name", new SupplierMy(HallsString), HallsINT);
-            generate(statement, Genres, "name", new SupplierMy(GenresString), GenresINT);
-            generate(statement, Newsreels, "name", new SupplierMy(NewsreelsString), NewsreelsINT);
-            generate(statement, Statuses, "description", new SupplierMy(StatusesString), StatusesINT);
+            generate(statement, Hall_types, "description", Hall_typesString);
+            generate(statement, Halls, "name", HallsString);
+            generate(statement, Genres, "name", GenresString);
+            generate(statement, Newsreels, "name", NewsreelsString);
+            generate(statement, Statuses, "description", StatusesString);
             System.out.println("Словари загружены!");
         } catch(Exception ex){
             System.out.println("Словари упали...");
@@ -164,12 +171,24 @@ public class Program{
 
         generateSlovary();
 
+        films();
+
     }
 
-    static void generate(Statement st, String table, String column, Supplier<String> sup, int times) {
-        StringBuilder x = new StringBuilder("INSERT " + table + "(" + column + ") VALUES (\"" + sup.get() + "\")");
-        for (int i = 0; i < times - 1; i++) {
-            String generated = "(\"" + sup.get() + "\")";
+    static String get(List<String> list, int maxSize) {
+        StringBuilder res = new StringBuilder();
+        String r = list.get(random.nextInt(list.size()));
+        while (res.length() +  r.length() < maxSize) {
+            res.append(" ").append(r);
+            r = list.get(random.nextInt(list.size()));
+        }
+        return res.toString();
+    }
+
+    static void generate(Statement st, String table, String column, String[] sup) {
+        StringBuilder x = new StringBuilder("INSERT " + table + "(" + column + ") VALUES (\"" + sup[0] + "\")");
+        for (int i = 1; i < sup.length; i++) {
+            String generated = "(\"" + sup[i] + "\")";
             x.append("," + generated);
         }
         x.append(";");
@@ -179,6 +198,27 @@ public class Program{
         } catch (SQLException throwables) {
             System.out.println("Table " + table + " fall");
             throwables.printStackTrace();
+        }
+    }
+
+    static void films() {
+        Path file = Path.of("src/main/resources/linuxwords.txt");
+         List<String> stringList = null;
+        try {
+            stringList = Files.readAllLines(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try (Connection conn = DriverManager.getConnection(url, username, password)){
+            Statement statement = conn.createStatement();
+            for (int i = 0; i < filmINT; i++) {
+                statement.executeUpdate("INSERT " + Films + " (name, age_rating, year, country)" +
+                        " VALUES (\"" + get(stringList, 50)+ "\","+ random.nextInt(22) +", " + 2000 + random.nextInt(20)+", \"Russia\")");
+            }
+            System.out.println("Словари загружены!");
+        } catch(Exception ex){
+            System.out.println("Словари упали...");
+            System.out.println(ex);
         }
     }
 
