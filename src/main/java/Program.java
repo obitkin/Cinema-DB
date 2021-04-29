@@ -1,24 +1,34 @@
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Random;
+import java.util.function.Supplier;
 
 public class Program{
 
-    String  Hall_types = "Hall_types";
-    String  Halls = "Halls";
-    String  Halls_info = "Halls_info";
-    String  Places = "Places";
-    String  Genres = "Genres";
-    String  Films = "Films";
-    String  Films_info = "Films_info";
-    String  Advertising = "Advertising";
-    String  Newsreels = "Newsreels";
-    String  Order_ad = "Order_ad";
-    String  Statuses = "Statuses";
-    String  Sessions = "Sessions";
-    String  Tickets = "Tickets";
-    String  Logs = "Logs";
+    /**
+     * USE cinema; SHOW TABLES; DROP DATABASE cinema; CREATE DATABASE cinema;
+     */
+
+    static Random random = new Random();
+
+    static String  Hall_types = "Hall_types";
+    static String  Halls = "Halls";
+    static String  Halls_info = "Halls_info";
+    static String  Places = "Places";
+    static String  Genres = "Genres";
+    static String  Films = "Films";
+    static String  Films_info = "Films_info";
+    static String  Advertising = "Advertising";
+    static String  Newsreels = "Newsreels";
+    static String  Order_ad = "Order_ad";
+    static String  Statuses = "Statuses";
+    static String  Sessions = "Sessions";
+    static String  Tickets = "Tickets";
+    static String  Logs = "Logs";
 
     static String[] creation = new String[] {
             "CREATE TABLE Hall_types (hall_type_id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(20))",
@@ -99,38 +109,81 @@ public class Program{
                     "FOREIGN KEY (status_id)  REFERENCES Statuses(status_id))"
     };
 
-    static String url = "jdbc:mysql://localhost/cinema";
-    static String username = "root";
-    static String password = "";
-
-    public static void main(String[] args) {
-
+    static void creation(String[] tables) {
         try (Connection conn = DriverManager.getConnection(url, username, password)){
-//            Statement statement = conn.createStatement();
-//            int rows = statement.executeUpdate("INSERT products(ProductName, Price) VALUES ('iPhone X', 76000)," +
-//                    "('Galaxy S9', 45000), ('Nokia 9', 36000)");
-//            System.out.printf("Added %d rows", rows);
             Statement statement = conn.createStatement();
-            for (String s : creation)
+            for (String s : tables) {
                 statement.executeUpdate(s);
-            System.out.println("Database has been created!");
+            }
+            System.out.println("Создание таблиц успешно!");
         } catch(Exception ex){
-            System.out.println("Connection failed...");
-
+            System.out.println("Таблицы упали...");
             System.out.println(ex);
         }
     }
 
+    static String url = "jdbc:mysql://localhost/cinema";
+    static String username = "root";
+    static String password = "";
 
-    static void remove(Statement statement, String[] removing) {
-        for (String s : removing) {
-            try {
-                statement.executeUpdate(s);
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
+    static int Hall_typesINT = 30;
+    static int HallsINT = 30;
+    static int GenresINT = 30;
+    static int NewsreelsINT = 30;
+    static int StatusesINT = 30;
+
+    static String[] Hall_typesString = new String[] {"3D", "IMAX", "KINO", "VIDEO", "4D", "5D"};
+    static String[] HallsString = new String[] {"Зал №1", "Зал №2", "Зал №3","Зал №4","Зал №5","Зал №6","Зал VIP"};
+    static String[] GenresString = new String[] {"Comedy","Drama","Shooter","War","Anime",
+            "Horror","Slasher","Documential","Fantasy","Fantastic",};
+    static String[] NewsreelsString = new String[] {"Newsreel 1","Newsreel 2","Newsreel 3",
+            "Newsreel 4","Newsreel 5",};
+    static String[] StatusesString = new String[] {"Free", "Bought online", "Bought offline",
+            "Reserved", "Used", "Not used"};
+
+
+    static void generateSlovary() {
+        try (Connection conn = DriverManager.getConnection(url, username, password)){
+            Statement statement = conn.createStatement();
+            statement.executeUpdate("SET NAMES 'utf8'");
+            generate(statement, Hall_types, "description", new SupplierMy(Hall_typesString), Hall_typesINT);
+            generate(statement, Halls, "name", new SupplierMy(HallsString), HallsINT);
+            generate(statement, Genres, "name", new SupplierMy(GenresString), GenresINT);
+            generate(statement, Newsreels, "name", new SupplierMy(NewsreelsString), NewsreelsINT);
+            generate(statement, Statuses, "description", new SupplierMy(StatusesString), StatusesINT);
+            System.out.println("Словари загружены!");
+        } catch(Exception ex){
+            System.out.println("Словари упали...");
+            System.out.println(ex);
         }
     }
+
+    public static void main(String[] args) {
+
+        creation(creation);
+
+        generateSlovary();
+
+    }
+
+    static void generate(Statement st, String table, String column, Supplier<String> sup, int times) {
+        StringBuilder x = new StringBuilder("INSERT " + table + "(" + column + ") VALUES (\"" + sup.get() + "\")");
+        for (int i = 0; i < times - 1; i++) {
+            String generated = "(\"" + sup.get() + "\")";
+            x.append("," + generated);
+        }
+        x.append(";");
+        try {
+            st.executeUpdate(x.toString());
+            System.out.println("Table " + table + " generated");
+        } catch (SQLException throwables) {
+            System.out.println("Table " + table + " fall");
+            throwables.printStackTrace();
+        }
+    }
+
+
+
 }
 
 
