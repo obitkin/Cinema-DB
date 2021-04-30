@@ -8,7 +8,7 @@ public class FieldIntEnum {
 
     private final int[] arr;
 
-    FieldIntEnum(int[] arr) {
+    public FieldIntEnum(int... arr) {
         this.arr = arr;
     }
 

@@ -9,7 +9,7 @@ public class FieldIntGap {
     private int current = 1;
     private final int max;
 
-    FieldIntGap(int max) {
+    public FieldIntGap(int max) {
         this.max = max;
     }
 

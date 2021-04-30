@@ -18,7 +18,7 @@ public class FieldStringRandom {
     private int length;
     private int size;
 
-    FieldStringRandom(Path[] paths, int length) throws IOException {
+    public FieldStringRandom(Path[] paths, int length) throws IOException {
         this.size = paths.length;
         this.length = length;
         lines = Arrays.stream(paths)

@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.NoSuchElementException;
+import java.util.List;
 
 public class Table {
 
@@ -20,7 +21,7 @@ public class Table {
     static {
         try {
             conn = DriverManager.getConnection(url, username, password);
-            System.out.println("Database has been created!");
+            System.out.println("Connections accepted!");
         } catch (SQLException throwables) {
             System.out.println("Connection failed...");
             System.out.println(throwables);
@@ -35,12 +36,12 @@ public class Table {
         this.columnsNames = columnsNames;
     }
 
-    public Table INSERT(String[] parameters) {
-        if (parameters == null || parameters.length == 0) {
+    public Table INSERT(List<String> parameters) {
+        if (parameters == null || parameters.size() == 0) {
             throw new IllegalArgumentException("parameters is NULL or EMPTY");
         }
-        if (columnsNames.length != parameters.length) {
-            throw new IllegalArgumentException(columnsNames.length + "   !=   " + parameters.length);
+        if (columnsNames.length != parameters.size()) {
+            throw new IllegalArgumentException(columnsNames.length + "   !=   " + parameters.size());
         }
         if (query == null) {
             query = new StringBuilder("INSERT " + tableName + " (");
@@ -57,9 +58,9 @@ public class Table {
         } else {
             query.append(",\n(");
         }
-        query.append("'" + parameters[0] + "'");
-        for (int i = 1; i < parameters.length; i++) {
-            query.append(", ").append("'" + parameters[i] + "'");
+        query.append("'" + parameters.get(0) + "'");
+        for (int i = 1; i < parameters.size(); i++) {
+            query.append(", ").append("'" + parameters.get(i) + "'");
         }
         query.append(")");
         return this;

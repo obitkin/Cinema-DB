@@ -14,7 +14,7 @@ public class FieldStringLimited {
     private int current = 0;
     private int length;
 
-    FieldStringLimited(Path path, int length) throws IOException {
+    public FieldStringLimited(Path path, int length) throws IOException {
         this.length = length;
         lines = Files.readAllLines(path);
     }
@@ -34,6 +34,14 @@ public class FieldStringLimited {
     }
 
     public String getRandom() {
-        return lines.get(random.nextInt(lines.size()));
+        String res;
+        do {
+            res = lines.get(random.nextInt(lines.size()));
+        } while (res.length() > length);
+        return res;
+    }
+
+    public List<String> getAll() {
+        return lines;
     }
 }
