@@ -45,18 +45,23 @@ public class Main implements CreationQuery, Data {
 
     public static void main(String[] args) {
 
-        createDB();
-        insert_Slovar(Hall_types_PARAMETERS, Hall_types, 20);
-        insert_Slovar(Genres_PARAMETERS, Genres, 50);
-        insert_Slovar(Halls_PARAMETERS, Halls, 40);
-        insert_Slovar(Statuses_PARAMETERS, Statuses, 40);
-        insert_Halls_info();
+//        createDB();
+//        insert_Slovar(Hall_types_PARAMETERS, Hall_types, 20);
+//        insert_Slovar(Genres_PARAMETERS, Genres, 50);
+//        insert_Slovar(Halls_PARAMETERS, Halls, 40);
+//        insert_Slovar(Statuses_PARAMETERS, Statuses, 40);
+//        insert_Halls_info();
+//        try {
+//            insert_Films();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        insert_Films_info();
         try {
-            insert_Films();
+            insert_Advertising();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        insert_Films_info();
 
     }
 
@@ -151,6 +156,23 @@ public class Main implements CreationQuery, Data {
         }
         insert(
                 Films_info,
+                res
+        );
+    }
+
+    static void insert_Advertising() throws IOException {
+        List<List<String>> res = new ArrayList<>();
+        Path[] pathsWords = new Path[] {Path.of(NAMES_AD), Path.of(PREPOSITION), Path.of(COMPANY_NAMES)};
+        for (int ad_id = 1; ad_id <= AD_ID_MAX; ad_id++) {
+            List<String> cortege = new ArrayList<>();
+            FieldStringRandom textField = new FieldStringRandom(pathsWords, 50);
+            cortege.add(textField.getRandom());
+            cortege.add(String.valueOf(new FieldIntEnum(AGE_RATING).getRandom()));
+            cortege.add("Video");
+            res.add(cortege);
+        }
+        insert(
+                Advertising,
                 res
         );
     }

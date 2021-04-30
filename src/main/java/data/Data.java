@@ -10,7 +10,6 @@ public interface Data {
     String RANDOM_PARAMETERS = randomDir + "/" + "linuxwords.txt";
     String COUNTRIES = randomDir + "/" + "countries";
 
-
     Table Hall_types = new Table(
             "Hall_types",
             new String[] {"description"});
@@ -50,6 +49,9 @@ public interface Data {
     Table Advertising = new Table(
             "Advertising",
             new String[] {"name", "age_rating", "video"});
+    String NAMES_AD = randomDir + "/" + "Names_AD";
+    String PREPOSITION = randomDir + "/" + "Preposition_AD";
+    String COMPANY_NAMES = randomDir + "/" + "Company_AD";
 
     Table Newsreels = new Table(
             "Newsreels",
