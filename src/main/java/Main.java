@@ -1,62 +1,47 @@
+import data.CreationQuery;
+import data.Data;
 import tables.Table;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-public class Main implements Data{
+public class Main implements CreationQuery, Data {
 
-    public static void executeQuery(String tableName, String[] columnNames, List<String> data) {
-        Table table = Table.of(tableName, columnNames);
-
-        try (Connection conn = DriverManager.getConnection(url, username, password)){
-            Statement statement = conn.createStatement();
-            for (String param : data) {
-                table.process(param.split(" "));
-            }
-            statement.executeUpdate(table.getQuery());
-            System.out.println(tableName + " was created!");
-        } catch(Exception ex){
-            System.out.println(tableName + " was failed!");
-            System.out.println(ex);
+    static void insert(Table table, List<String[]> corteges) {
+        for (String[] cortege : corteges) {
+            table.INSERT(cortege);
         }
-    }
-
-    static void createDB() {
-        try (Connection conn = DriverManager.getConnection(url, username, password)){
-            Statement statement = conn.createStatement();
-            createDB(statement, creation);
-            System.out.println("Database has been created!");
-        } catch(Exception ex){
-            System.out.println("Connection failed...");
-            System.out.println(ex);
-        }
-    }
-
-    static void createDB(Statement statement, String[] creators) throws SQLException {
-        for (String creator : creators) {
-            statement.executeUpdate(creator);
+        try {
+            table.executeQuery();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            System.out.println(table.tableName + " can't insert " + corteges.size() + " corteges");
         }
     }
 
     public static void main(String[] args) {
 
-        //createDB();
+        createDB();
 
-        try {
-            executeQuery(
-                    Hall_types,
-                    new String[] {"description"},
-                    Files.readAllLines(Path.of("src/main/java/data/Hall_types")));
-        } catch (IOException e) {
-            e.printStackTrace();
+    }
+
+
+
+
+    static void createDB() {
+        try (Connection conn = DriverManager.getConnection(url, username, password)){
+            Statement statement = conn.createStatement();
+            for (String creator : creation) {
+                statement.executeUpdate(creator);
+            }
+            System.out.println("Database has been created!");
+        } catch(Exception ex){
+            System.out.println("Connection failed...");
+            System.out.println(ex);
         }
-
-
     }
 }
