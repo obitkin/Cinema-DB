@@ -5,6 +5,11 @@ import tables.Table;
 public interface Data {
 
     String parametersDir = "src/main/resources/tables/parameters";
+    String randomDir = "src/main/resources/tables/random";
+
+    String RANDOM_PARAMETERS = randomDir + "/" + "linuxwords.txt";
+    String COUNTRIES = randomDir + "/" + "countries";
+
 
     Table Hall_types = new Table(
             "Hall_types",

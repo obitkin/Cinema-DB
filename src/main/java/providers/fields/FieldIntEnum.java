@@ -13,7 +13,7 @@ public class FieldIntEnum {
     }
 
     public int getRandom() {
-        return random.nextInt(arr.length);
+        return arr[random.nextInt(arr.length)];
     }
 
 }
