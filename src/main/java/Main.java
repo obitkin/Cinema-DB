@@ -45,24 +45,29 @@ public class Main implements CreationQuery, Data {
 
     public static void main(String[] args) {
 
-//        createDB();
-//        insert_Slovar(Hall_types_PARAMETERS, Hall_types, 20);
-//        insert_Slovar(Genres_PARAMETERS, Genres, 50);
-//        insert_Slovar(Halls_PARAMETERS, Halls, 40);
-//        insert_Slovar(Statuses_PARAMETERS, Statuses, 40);
-//        insert_Halls_info();
-//        try {
-//            insert_Films();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        insert_Films_info();
+        createDB();
+        insert_Slovar(Hall_types_PARAMETERS, Hall_types, 20);
+        insert_Slovar(Genres_PARAMETERS, Genres, 50);
+        insert_Slovar(Halls_PARAMETERS, Halls, 40);
+        insert_Slovar(Statuses_PARAMETERS, Statuses, 40);
+        insert_Halls_info();
+        try {
+            insert_Films();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        insert_Films_info();
         try {
             insert_Advertising();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        try {
+            insert_Newsreels();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        insert_Order_ad();
     }
 
     static void insert_Slovar(String pathString, Table table, int length) {
@@ -177,6 +182,40 @@ public class Main implements CreationQuery, Data {
         );
     }
 
+    static void insert_Newsreels() throws IOException {
+        List<List<String>> res = new ArrayList<>();
+        Path[] pathsWords = new Path[] {Path.of(RANDOM_PARAMETERS)};
+        for (int newsreel_id = 1; newsreel_id <= NEWSREEL_ID_MAX; newsreel_id++) {
+            List<String> cortege = new ArrayList<>();
+            FieldStringRandom textField = new FieldStringRandom(pathsWords, 40);
+            cortege.add(textField.getRandom() + " " + String.valueOf(newsreel_id));
+            res.add(cortege);
+        }
+        insert(
+                Newsreels,
+                res
+        );
+    }
+
+    static void insert_Order_ad() {
+        List<List<String>> res = new ArrayList<>();
+        for (int newsreel_id = 1; newsreel_id <= NEWSREEL_ID_MAX; newsreel_id++) {
+            int sizeOfNewsreel = random.nextInt(6) + 10;
+            int[] ordering = getRand(sizeOfNewsreel, sizeOfNewsreel);
+            for (int i = 1; i <= sizeOfNewsreel; i++) {
+                List<String> cortege = new ArrayList<>();
+                cortege.add(String.valueOf(newsreel_id));
+                cortege.add(String.valueOf(random.nextInt(AD_ID_MAX) + 1));
+                cortege.add(String.valueOf(ordering[i - 1]));
+                res.add(cortege);
+            }
+        }
+        insert(
+                Order_ad,
+                res
+        );
+    }
+
 
     static void createDB() {
         try (Connection conn = DriverManager.getConnection(url, username, password)){
@@ -191,12 +230,25 @@ public class Main implements CreationQuery, Data {
         }
     }
 
+    static int[] getRand(int count, int size) {
+        List<Integer> list = IntStream.rangeClosed(1, size)
+                .boxed()
+                .collect(Collectors.toList());
+        int[] res = new int[count];
+        for (int i = 0; i < count; i++) {
+            int index = random.nextInt(list.size());
+            res[i] = list.get(index);
+            list.remove(index);
+        }
+        return res;
+    }
+
     static int[] getRand(int count, Integer[] arr) {
         List<Integer> list = new ArrayList<Integer>(Arrays.asList(arr));
         int[] res = new int[count];
         for (int i = 0; i < count; i++) {
             int index = random.nextInt(list.size());
-            res[i] = list.get(random.nextInt(list.size()));
+            res[i] = list.get(index);
             list.remove(index);
         }
         return res;
