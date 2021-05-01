@@ -26,12 +26,12 @@ public class Main implements CreationQuery, Data {
 
     static int[] AGE_RATING = new int[] {0, 6, 12, 16, 18, 21};
     static int HALL_ID_MAX = 20;
-    static int FILM_ID_MAX = 1000;
+    static int FILM_ID_MAX = 50;
     static int GENRES_ID_MAX = 5;
     static int AD_ID_MAX = 50;
     static int NEWSREEL_ID_MAX = 1000;
     static int HALL_TYPE_ID_MAX = 5;
-    static int SESSIONS_ID_MAX = 10000;
+    static int SESSIONS_ID_MAX = 1000;
 
     static class Film {
         int id;
@@ -76,8 +76,8 @@ public class Main implements CreationQuery, Data {
     }
 
     static List<List<Integer>> places = new ArrayList<>(1500);
-    static List<Film> films = new ArrayList<>(1000);
-    static List<Session> sessions = new ArrayList<>(10050);
+    static List<Film> films = new ArrayList<>(50);
+    static List<Session> sessions = new ArrayList<>(1050);
 
     static void insert(Table table, List<List<String>> corteges) {
         for (List<String> cortege : corteges) {
@@ -308,24 +308,24 @@ public class Main implements CreationQuery, Data {
                     LocalTime.of(0, 0, 0)));
         }
         int session_id = 1;
-        while (session_id < 10000) {
+        while (session_id < SESSIONS_ID_MAX) {
             for (int i = 0; i < HALL_ID_MAX; i++) {
                 Film d;
                 if ((d = getLastAccepted(hallsPerTime.get(i))) != null) {
                     List<String> cortege = new ArrayList<>();
                     cortege.add(String.valueOf(i + 1));
                     cortege.add(String.valueOf(d.id));
-                    cortege.add(String.valueOf(random.nextInt(1000) + 1));
+                    cortege.add(String.valueOf(random.nextInt(NEWSREEL_ID_MAX) + 1));
                     cortege.add(String.valueOf(hallsPerTime.get(i)));
                     Session session = new Session(i + 1, hallsPerTime.get(i), films.get(d.id - 1));
                     System.out.println(session.toString());
                     sessions.add(session);
                     hallsPerTime.set(i, hallsPerTime.get(i).plus(d.time));
-                    hallsPerTime.set(i, hallsPerTime.get(i).plusDays(random.nextInt(4) + 1));
+                    hallsPerTime.set(i, hallsPerTime.get(i).plusHours(random.nextInt(4)+5));
                     res.add(cortege);
                     session_id++;
                 } else {
-                    hallsPerTime.set(i, hallsPerTime.get(i).plusDays(3));
+                    hallsPerTime.set(i, hallsPerTime.get(i).plusHours(random.nextInt(4)+5));
                 }
             }
             System.out.println("session_id = " + session_id);
@@ -435,7 +435,7 @@ public class Main implements CreationQuery, Data {
         List<List<String>> TicketsRes1 = new ArrayList<>();
         List<List<String>> TicketsRes2 = new ArrayList<>();
         List<List<String>> LogsRes = new ArrayList<>();
-        current = sessions.get(9900).time;
+        current = sessions.get(990).time;
         int ticket_id = 1;
         for (int i = 0; i < sessions.size(); i++) {
             System.out.println("Session " + i);
@@ -452,7 +452,7 @@ public class Main implements CreationQuery, Data {
             }
             List<MyKeyValueHolder<Ticket,LocalDateTime>> ticketsAndTimePerSession = new ArrayList<>();
             List<Log> logPerSession = new ArrayList<>();
-            int minusMinutes = random.nextInt(24 * 7 * 60) + 24 * 60;
+            int minusMinutes = random.nextInt(24 * 2 * 60) + 24 * 60;
             LocalDateTime addTime = sessionTime.minusMinutes(minusMinutes);
             for (int place_id : getPlaces(session.hall_id)) {
                 if (getPercent(98)) {
