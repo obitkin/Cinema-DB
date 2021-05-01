@@ -544,9 +544,26 @@ public class Main implements CreationQuery, Data {
                 Tickets2,
                 TicketsRes2
         );
+        int size = LogsRes.size();
+        List<List<String>> res1 = LogsRes.subList(0, size / 4);
+        List<List<String>> res2 = LogsRes.subList(size / 4, size / 2);
+        List<List<String>> res3 = LogsRes.subList(size / 2, size / 4 * 3);
+        List<List<String>> res4 = LogsRes.subList(size / 4 * 3, size);
         insert(
                 Logs,
-                LogsRes
+                res1
+        );
+        insert(
+                Logs,
+                res2
+        );
+        insert(
+                Logs,
+                res3
+        );
+        insert(
+                Logs,
+                res4
         );
     }
 
