@@ -12,12 +12,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.time.LocalTime;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.sql.Date;
+import java.sql.Time;
 
 public class Main implements CreationQuery, Data {
 
@@ -30,6 +30,21 @@ public class Main implements CreationQuery, Data {
     static int AD_ID_MAX = 50;
     static int NEWSREEL_ID_MAX = 1000;
     static int HALL_TYPE_ID_MAX = 5;
+
+    static class Film {
+        int id;
+        int year;
+        LocalTime time;
+
+        public Film(int id, int year, LocalTime time) {
+            this.id = id;
+            this.year = year;
+            this.time = time;
+        }
+    }
+
+    static List<List<Integer>> places = new ArrayList<>(1500);
+    static List<Film> films = new ArrayList<>(1000);
 
     static void insert(Table table, List<List<String>> corteges) {
         for (List<String> cortege : corteges) {
@@ -68,7 +83,7 @@ public class Main implements CreationQuery, Data {
 //            e.printStackTrace();
 //        }
 //        insert_Order_ad();
-        insert_Places();
+//        insert_Places();
     }
 
     static void insert_Slovar(String pathString, Table table, int length) {
@@ -118,7 +133,7 @@ public class Main implements CreationQuery, Data {
 
     static void insert_Films() throws IOException {
         List<List<String>> res = new ArrayList<>();
-        int year = 2000;
+        int year = 2014;
         Path[] pathsWords = new Path[] {Path.of(RANDOM_PARAMETERS), Path.of(RANDOM_PARAMETERS), Path.of(RANDOM_PARAMETERS)};
         Path[] pathsCountry = new Path[] {Path.of(COUNTRIES)};
         for (int film_id = 1; film_id <= FILM_ID_MAX; film_id++) {
@@ -127,7 +142,7 @@ public class Main implements CreationQuery, Data {
             cortege.add(textField.getRandom());
             cortege.add(String.valueOf(new FieldIntEnum(AGE_RATING).getRandom()));
             cortege.add(textField.getRandom());
-            year += (random.nextInt(100) > 98) ? 1 : 0;
+            year += (random.nextInt(1000) > 995) ? 1 : 0;
             cortege.add(String.valueOf(year));
             FieldStringRandom country = new FieldStringRandom(pathsCountry, 100);
             cortege.add(country.getRandom());
@@ -142,6 +157,13 @@ public class Main implements CreationQuery, Data {
             );
             cortege.add("Poster");
             cortege.add("Video");
+
+            films.add(new Film(film_id,
+                    year,
+                    LocalTime.of(
+                            seconds / 60 / 60,
+                            seconds / 60 % 60,
+                    sec2 - (sec2 / 60) * 60)));
             res.add(cortege);
         }
         insert(
@@ -219,6 +241,29 @@ public class Main implements CreationQuery, Data {
 
     static void insert_Places() {
         List<List<String>> res = new ArrayList<>();
+        int counter = 1;
+        for (int hall_id = 1; hall_id <= HALL_ID_MAX; hall_id++) {
+            int row = random.nextInt(4) + 7;
+            int seats = random.nextInt(4) + 7;
+            for (int i = 1; i <= row; i++) {
+                for (int j = 1; j <= seats; j++) {
+                    places.add(List.of(hall_id, counter++));
+                    List<String> cortege = new ArrayList<>();
+                    cortege.add(String.valueOf(hall_id));
+                    cortege.add(String.valueOf(i));
+                    cortege.add(String.valueOf(j));
+                    res.add(cortege);
+                }
+            }
+        }
+        insert(
+                Places,
+                res
+        );
+    }
+
+    static void insert_Sessions() {
+        List<List<String>> res = new ArrayList<>();
         for (int hall_id = 1; hall_id <= HALL_ID_MAX; hall_id++) {
             int row = random.nextInt(4) + 7;
             int seats = random.nextInt(4) + 7;
@@ -233,7 +278,7 @@ public class Main implements CreationQuery, Data {
             }
         }
         insert(
-                Places,
+                Sessions,
                 res
         );
     }
