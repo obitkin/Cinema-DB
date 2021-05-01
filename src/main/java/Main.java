@@ -117,6 +117,7 @@ public class Main implements CreationQuery, Data {
         insert_Order_ad();
         insert_Places();
         insert_Sessions();
+        insert_Tickets_Logs();
     }
 
     static void insert_Slovar(String pathString, Table table, int length) {
