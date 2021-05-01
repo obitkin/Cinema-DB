@@ -85,6 +85,7 @@ public class Main implements CreationQuery, Data {
         }
         insert_Order_ad();
         insert_Places();
+        insert_Sessions();
     }
 
     static void insert_Slovar(String pathString, Table table, int length) {
@@ -281,12 +282,12 @@ public class Main implements CreationQuery, Data {
                     cortege.add(String.valueOf(d.id));
                     cortege.add(String.valueOf(random.nextInt(1000) + 1));
                     cortege.add(String.valueOf(hallsPerTime.get(i)));
-                    hallsPerTime.get(i).plus(d.time);
-                    hallsPerTime.get(i).plusHours(random.nextInt(2) + 1);
-
+                    hallsPerTime.set(i, hallsPerTime.get(i).plus(d.time));
+                    hallsPerTime.set(i, hallsPerTime.get(i).plusHours(random.nextInt(5) + 1));
+                    res.add(cortege);
                     session_id++;
                 } else {
-                    hallsPerTime.get(i).plusDays(1);
+                    hallsPerTime.set(i, hallsPerTime.get(i).plusDays(1));
                 }
             }
             System.out.println("session_id = " + session_id);
