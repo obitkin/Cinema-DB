@@ -341,17 +341,34 @@ public class Main implements CreationQuery, Data {
 
     static class Ticket {
 
-        public Ticket(int place_id, int status_id, int session_id, String booking) {
+        public Ticket(int ticket_id, int place_id, int status_id, int session_id, String booking) {
+            this.ticket_id = ticket_id;
             this.place_id = place_id;
             this.status_id = status_id;
             this.session_id = session_id;
             this.booking = booking;
         }
 
+        int ticket_id;
         int place_id;
         int status_id;
         int session_id;
         String booking;
+
+
+    }
+
+    static class Log {
+
+        public Log(int ticket_id, int status_id, LocalDateTime time) {
+            this.ticket_id = ticket_id;
+            this.status_id = status_id;
+            this.time = time;
+        }
+
+        int ticket_id;
+        int status_id;
+        LocalDateTime time;
 
 
     }
@@ -373,35 +390,129 @@ public class Main implements CreationQuery, Data {
      */
 
     static void insert_Tickets_Logs() {
-        List<List<String>> TicketsRes = new ArrayList<>();
+        List<List<String>> TicketsRes1 = new ArrayList<>();
+        List<List<String>> TicketsRes2 = new ArrayList<>();
         List<List<String>> LogsRes = new ArrayList<>();
         int ticket_id = 1;
         for (int i = 0; i < sessions.size(); i++) {
             Session session = sessions.get(i);
-            List<Ticket> ticketsPerSession = new ArrayList<>();
+            LocalDateTime sessionTime;
+            boolean was = false;
             if (session.time.isBefore(current)) {
-                for (int place_id : getPlaces(session.hall_id)) {
-                    if (random.nextInt(100) > 98) {
-                        List<String> cortege = new ArrayList<>();
-                        Ticket t = new Ticket(place_id, 1, i + 1, null);
-                        ticketsPerSession.add(t);
-                        cortege.add(String.valueOf(t.place_id));
-                        cortege.add(String.valueOf(t.place_id));
+                was = true;
+                sessionTime = session.time;
+            }
+            else {
+                was = false;
+                sessionTime = current;
+            }
+            List<Map.Entry<Ticket,LocalDateTime>> ticketsAndTimePerSession = new ArrayList<>();
+            List<Log> logPerSession = new ArrayList<>();
+            int minusMinutes = random.nextInt(24 * 7 * 60) + 24 * 60;
+            LocalDateTime addTime = sessionTime.minusMinutes(minusMinutes);
+            for (int place_id : getPlaces(session.hall_id)) {
+                if (getPercent(98)) {
+                    Ticket ticket = new Ticket(ticket_id++, place_id, 1, i + 1, null);
+                    ticketsAndTimePerSession.add(Map.entry(ticket, addTime));
+                    logPerSession.add(new Log(ticket.ticket_id, ticket.status_id, addTime));
+                }
+            }
+
+            for (Map.Entry<Ticket,LocalDateTime> ticket : ticketsAndTimePerSession) {
+                if (getPercent(50)) {
+                    if (getPercent(10)) {
+                        ticket.getKey().status_id = 4;
+                        ticket.getKey().booking = "XXXXX";
+                        ticket.setValue(ticket.getValue().plusMinutes(random.nextInt(minusMinutes / 3)));
+                        logPerSession.add(new Log(ticket.getKey().ticket_id, ticket.getKey().status_id, ticket.getValue()));
+                        if (getPercent(60)) {
+                            ticket.getKey().status_id = random.nextInt(2) + 2;
+                            ticket.setValue(ticket.getValue().plusMinutes(random.nextInt(minusMinutes / 3)));
+                            logPerSession.add(new Log(ticket.getKey().ticket_id, ticket.getKey().status_id, ticket.getValue()));
+                        } else {
+                            ticket.getKey().status_id = 1;
+                            ticket.setValue(sessionTime.minusMinutes(40));
+                            logPerSession.add(new Log(ticket.getKey().ticket_id, ticket.getKey().status_id, ticket.getValue()));
+                            if (getPercent(50)) {
+                                ticket.getKey().status_id = random.nextInt(2) + 2;
+                                ticket.setValue(ticket.getValue().plusMinutes(random.nextInt(39)));
+                                logPerSession.add(new Log(ticket.getKey().ticket_id, ticket.getKey().status_id, ticket.getValue()));
+                            }
+                        }
+                    }
+                    else {
+                        ticket.getKey().status_id = random.nextInt(2) + 2;
+                        ticket.setValue(ticket.getValue().plusMinutes(random.nextInt(minusMinutes / 3)));
+                        logPerSession.add(new Log(ticket.getKey().ticket_id, ticket.getKey().status_id, ticket.getValue()));
+                        if (getPercent(10)) {
+                            ticket.getKey().status_id = 1;
+                            ticket.setValue(ticket.getValue().plusMinutes(random.nextInt(minusMinutes / 3)));
+                            logPerSession.add(new Log(ticket.getKey().ticket_id, ticket.getKey().status_id, ticket.getValue()));
+                        }
                     }
                 }
-            } else {
+            }
 
+            if (was) {
+                for (Map.Entry<Ticket,LocalDateTime> ticket : ticketsAndTimePerSession) {
+                    if (ticket.getKey().status_id == 2 || ticket.getKey().status_id == 3) {
+                        if (getPercent(95)) {
+                            ticket.getKey().status_id = 5;
+                            ticket.setValue(sessionTime.plus(session.film.time));
+                            logPerSession.add(new Log(ticket.getKey().ticket_id, ticket.getKey().status_id, ticket.getValue()));
+                        } else {
+                            ticket.getKey().status_id = 6;
+                            ticket.setValue(sessionTime.plus(session.film.time));
+                            logPerSession.add(new Log(ticket.getKey().ticket_id, ticket.getKey().status_id, ticket.getValue()));
+                        }
+                    }
+                }
+
+            }
+
+            for (Log log : logPerSession) {
+                List<String> cortage = new ArrayList<>();
+                cortage.add(String.valueOf(log.ticket_id));
+                cortage.add(String.valueOf(log.status_id));
+                cortage.add(String.valueOf(log.time));
+                LogsRes.add(cortage);
+            }
+
+            for (Map.Entry<Ticket,LocalDateTime> ticket : ticketsAndTimePerSession) {
+                List<String> cortage = new ArrayList<>();
+                cortage.add(String.valueOf(ticket.getKey().place_id));
+                cortage.add(String.valueOf(ticket.getKey().status_id));
+                cortage.add(String.valueOf(ticket.getKey().session_id));
+                if (ticket.getKey().booking == null) {
+                    TicketsRes1.add(cortage);
+                } else {
+                    cortage.add(String.valueOf(ticket.getKey().booking));
+                    TicketsRes2.add(cortage);
+                }
             }
         }
 
         insert(
-                Tickets,
-                TicketsRes
+                Tickets1,
+                TicketsRes1
+        );
+        insert(
+                Tickets2,
+                TicketsRes2
         );
         insert(
                 Logs,
                 LogsRes
         );
+    }
+
+    /**
+     *
+     * @param i = 0..100
+     * @return
+     */
+    static boolean getPercent(int i) {
+        return random.nextInt(100) < i;
     }
 
     static Film getLastAccepted(LocalDateTime time) {

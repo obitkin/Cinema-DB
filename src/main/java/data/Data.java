@@ -65,9 +65,13 @@ public interface Data {
             "Sessions",
             new String[] {"hall_id", "film_id", "newsreel_id", "time"});
 
-    Table Tickets = new Table(
+    Table Tickets1 = new Table(
             "Tickets",
             new String[] {"place_id", "status_id", "session_id", "booking_code"});
+
+    Table Tickets2 = new Table(
+            "Tickets",
+            new String[] {"place_id", "status_id", "session_id"});
 
     Table Logs = new Table(
             "Logs",
