@@ -144,7 +144,7 @@ public class Main implements CreationQuery, Data {
             cortege.add(textField.getRandom());
             cortege.add(String.valueOf(new FieldIntEnum(AGE_RATING).getRandom()));
             cortege.add(textField.getRandom());
-            time = time.plusDays(random.nextInt(10));
+            time = time.plusDays(random.nextInt(4));
             cortege.add(time.toString());
             FieldStringRandom country = new FieldStringRandom(pathsCountry, 100);
             cortege.add(country.getRandom());
@@ -283,11 +283,11 @@ public class Main implements CreationQuery, Data {
                     cortege.add(String.valueOf(random.nextInt(1000) + 1));
                     cortege.add(String.valueOf(hallsPerTime.get(i)));
                     hallsPerTime.set(i, hallsPerTime.get(i).plus(d.time));
-                    hallsPerTime.set(i, hallsPerTime.get(i).plusHours(random.nextInt(5) + 1));
+                    hallsPerTime.set(i, hallsPerTime.get(i).plusDays(random.nextInt(4) + 1));
                     res.add(cortege);
                     session_id++;
                 } else {
-                    hallsPerTime.set(i, hallsPerTime.get(i).plusDays(1));
+                    hallsPerTime.set(i, hallsPerTime.get(i).plusDays(3));
                 }
             }
             System.out.println("session_id = " + session_id);
