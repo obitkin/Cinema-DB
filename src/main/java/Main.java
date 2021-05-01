@@ -42,10 +42,41 @@ public class Main implements CreationQuery, Data {
             this.date = date;
             this.time = Duration.ofSeconds(time.getHour()*3600+time.getMinute()*60+time.getSecond());
         }
+
+        @Override
+        public String toString() {
+            return "Film{" +
+                    "id=" + id +
+                    ", date=" + date +
+                    ", time=" + time +
+                    '}';
+        }
+    }
+
+    static class Session {
+        int hall_id;
+        LocalDateTime time;
+        Film film;
+
+        public Session(int hall_id, LocalDateTime time, Film film) {
+            this.hall_id = hall_id;
+            this.time = time;
+            this.film = film;
+        }
+
+        @Override
+        public String toString() {
+            return "Session{" +
+                    "hall_id=" + hall_id +
+                    ", time=" + time +
+                    ", " + film.toString() +
+                    '}';
+        }
     }
 
     static List<List<Integer>> places = new ArrayList<>(1500);
     static List<Film> films = new ArrayList<>(1000);
+    static List<Session> sessions = new ArrayList<>(10050);
 
     static void insert(Table table, List<List<String>> corteges) {
         for (List<String> cortege : corteges) {
@@ -264,6 +295,8 @@ public class Main implements CreationQuery, Data {
         );
     }
 
+
+
     static void insert_Sessions() {
         List<List<String>> res = new ArrayList<>();
         List<LocalDateTime> hallsPerTime = new ArrayList<>(HALL_ID_MAX);
@@ -282,6 +315,12 @@ public class Main implements CreationQuery, Data {
                     cortege.add(String.valueOf(d.id));
                     cortege.add(String.valueOf(random.nextInt(1000) + 1));
                     cortege.add(String.valueOf(hallsPerTime.get(i)));
+                    if (i == 9900) {
+                        current = hallsPerTime.get(i);
+                    }
+                    Session session = new Session(i + 1, hallsPerTime.get(i), films.get(d.id - 1));
+                    System.out.println(session.toString());
+                    sessions.add(session);
                     hallsPerTime.set(i, hallsPerTime.get(i).plus(d.time));
                     hallsPerTime.set(i, hallsPerTime.get(i).plusDays(random.nextInt(4) + 1));
                     res.add(cortege);
@@ -295,6 +334,73 @@ public class Main implements CreationQuery, Data {
         insert(
                 Sessions,
                 res
+        );
+    }
+
+    static LocalDateTime current;
+
+    static class Ticket {
+
+        public Ticket(int place_id, int status_id, int session_id, String booking) {
+            this.place_id = place_id;
+            this.status_id = status_id;
+            this.session_id = session_id;
+            this.booking = booking;
+        }
+
+        int place_id;
+        int status_id;
+        int session_id;
+        String booking;
+
+
+    }
+
+    static List<Integer> getPlaces(int hall_id) {
+        return places.stream()
+                .filter(x -> x.get(0).equals(hall_id))
+                .map(x -> x.get(1))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 1 Free
+     * 2 Online
+     * 3 Offline
+     * 4 Reserved
+     * 5 Used
+     * 6 Not Used
+     */
+
+    static void insert_Tickets_Logs() {
+        List<List<String>> TicketsRes = new ArrayList<>();
+        List<List<String>> LogsRes = new ArrayList<>();
+        int ticket_id = 1;
+        for (int i = 0; i < sessions.size(); i++) {
+            Session session = sessions.get(i);
+            List<Ticket> ticketsPerSession = new ArrayList<>();
+            if (session.time.isBefore(current)) {
+                for (int place_id : getPlaces(session.hall_id)) {
+                    if (random.nextInt(100) > 98) {
+                        List<String> cortege = new ArrayList<>();
+                        Ticket t = new Ticket(place_id, 1, i + 1, null);
+                        ticketsPerSession.add(t);
+                        cortege.add(String.valueOf(t.place_id));
+                        cortege.add(String.valueOf(t.place_id));
+                    }
+                }
+            } else {
+
+            }
+        }
+
+        insert(
+                Tickets,
+                TicketsRes
+        );
+        insert(
+                Logs,
+                LogsRes
         );
     }
 
