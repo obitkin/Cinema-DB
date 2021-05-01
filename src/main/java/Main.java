@@ -12,11 +12,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.sql.Date;
 import java.sql.Time;
 
 public class Main implements CreationQuery, Data {
@@ -30,16 +29,17 @@ public class Main implements CreationQuery, Data {
     static int AD_ID_MAX = 50;
     static int NEWSREEL_ID_MAX = 1000;
     static int HALL_TYPE_ID_MAX = 5;
+    static int SESSIONS_ID_MAX = 10000;
 
     static class Film {
         int id;
-        int year;
-        LocalTime time;
+        LocalDateTime date;
+        Duration time;
 
-        public Film(int id, int year, LocalTime time) {
+        public Film(int id, LocalDateTime date, LocalTime time) {
             this.id = id;
-            this.year = year;
-            this.time = time;
+            this.date = date;
+            this.time = Duration.ofSeconds(time.getHour()*3600+time.getMinute()*60+time.getSecond());
         }
     }
 
@@ -60,30 +60,30 @@ public class Main implements CreationQuery, Data {
 
     public static void main(String[] args) {
 
-//        createDB();
-//        insert_Slovar(Hall_types_PARAMETERS, Hall_types, 20);
-//        insert_Slovar(Genres_PARAMETERS, Genres, 50);
-//        insert_Slovar(Halls_PARAMETERS, Halls, 40);
-//        insert_Slovar(Statuses_PARAMETERS, Statuses, 40);
-//        insert_Halls_info();
-//        try {
-//            insert_Films();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        insert_Films_info();
-//        try {
-//            insert_Advertising();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            insert_Newsreels();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        insert_Order_ad();
-//        insert_Places();
+        createDB();
+        insert_Slovar(Hall_types_PARAMETERS, Hall_types, 20);
+        insert_Slovar(Genres_PARAMETERS, Genres, 50);
+        insert_Slovar(Halls_PARAMETERS, Halls, 40);
+        insert_Slovar(Statuses_PARAMETERS, Statuses, 40);
+        insert_Halls_info();
+        try {
+            insert_Films();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        insert_Films_info();
+        try {
+            insert_Advertising();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            insert_Newsreels();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        insert_Order_ad();
+        insert_Places();
     }
 
     static void insert_Slovar(String pathString, Table table, int length) {
@@ -133,7 +133,7 @@ public class Main implements CreationQuery, Data {
 
     static void insert_Films() throws IOException {
         List<List<String>> res = new ArrayList<>();
-        int year = 2014;
+        LocalDateTime time = LocalDateTime.of(2014,1,1,0,0,1);
         Path[] pathsWords = new Path[] {Path.of(RANDOM_PARAMETERS), Path.of(RANDOM_PARAMETERS), Path.of(RANDOM_PARAMETERS)};
         Path[] pathsCountry = new Path[] {Path.of(COUNTRIES)};
         for (int film_id = 1; film_id <= FILM_ID_MAX; film_id++) {
@@ -142,8 +142,8 @@ public class Main implements CreationQuery, Data {
             cortege.add(textField.getRandom());
             cortege.add(String.valueOf(new FieldIntEnum(AGE_RATING).getRandom()));
             cortege.add(textField.getRandom());
-            year += (random.nextInt(1000) > 995) ? 1 : 0;
-            cortege.add(String.valueOf(year));
+            time = time.plusDays(random.nextInt(2));
+            cortege.add(time.toString());
             FieldStringRandom country = new FieldStringRandom(pathsCountry, 100);
             cortege.add(country.getRandom());
             int seconds = random.nextInt(3600 * 3) + 100;
@@ -159,7 +159,7 @@ public class Main implements CreationQuery, Data {
             cortege.add("Video");
 
             films.add(new Film(film_id,
-                    year,
+                    time,
                     LocalTime.of(
                             seconds / 60 / 60,
                             seconds / 60 % 60,
@@ -264,18 +264,9 @@ public class Main implements CreationQuery, Data {
 
     static void insert_Sessions() {
         List<List<String>> res = new ArrayList<>();
-        for (int hall_id = 1; hall_id <= HALL_ID_MAX; hall_id++) {
-            int row = random.nextInt(4) + 7;
-            int seats = random.nextInt(4) + 7;
-            for (int i = 1; i <= row; i++) {
-                for (int j = 1; j <= seats; j++) {
-                    List<String> cortege = new ArrayList<>();
-                    cortege.add(String.valueOf(hall_id));
-                    cortege.add(String.valueOf(i));
-                    cortege.add(String.valueOf(j));
-                    res.add(cortege);
-                }
-            }
+        LocalDateTime dateTime = LocalDateTime.of(LocalDate.of(2014, 1, 1), LocalTime.of(0, 0, 1));
+        for (int session_id = 1; session_id <= SESSIONS_ID_MAX; session_id++) {
+            //Date d = new Time(1,1,1).toInstant();
         }
         insert(
                 Sessions,

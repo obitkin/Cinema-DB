@@ -40,7 +40,7 @@ public interface Data {
 
     Table Films = new Table(
             "Films",
-            new String[] {"name", "age_rating" , "description", "year", "country", "duration", "poster", "video"});
+            new String[] {"name", "age_rating" , "description", "time", "country", "duration", "poster", "video"});
 
     Table Films_info = new Table(
             "Films_info",
@@ -63,7 +63,7 @@ public interface Data {
 
     Table Sessions = new Table(
             "Sessions",
-            new String[] {"hall_id", "film_id", "newsreel_id", "time", "date"});
+            new String[] {"hall_id", "film_id", "newsreel_id", "time"});
 
     Table Tickets = new Table(
             "Tickets",
