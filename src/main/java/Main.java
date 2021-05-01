@@ -45,29 +45,30 @@ public class Main implements CreationQuery, Data {
 
     public static void main(String[] args) {
 
-        createDB();
-        insert_Slovar(Hall_types_PARAMETERS, Hall_types, 20);
-        insert_Slovar(Genres_PARAMETERS, Genres, 50);
-        insert_Slovar(Halls_PARAMETERS, Halls, 40);
-        insert_Slovar(Statuses_PARAMETERS, Statuses, 40);
-        insert_Halls_info();
-        try {
-            insert_Films();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        insert_Films_info();
-        try {
-            insert_Advertising();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            insert_Newsreels();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        insert_Order_ad();
+//        createDB();
+//        insert_Slovar(Hall_types_PARAMETERS, Hall_types, 20);
+//        insert_Slovar(Genres_PARAMETERS, Genres, 50);
+//        insert_Slovar(Halls_PARAMETERS, Halls, 40);
+//        insert_Slovar(Statuses_PARAMETERS, Statuses, 40);
+//        insert_Halls_info();
+//        try {
+//            insert_Films();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        insert_Films_info();
+//        try {
+//            insert_Advertising();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            insert_Newsreels();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        insert_Order_ad();
+        insert_Places();
     }
 
     static void insert_Slovar(String pathString, Table table, int length) {
@@ -212,6 +213,27 @@ public class Main implements CreationQuery, Data {
         }
         insert(
                 Order_ad,
+                res
+        );
+    }
+
+    static void insert_Places() {
+        List<List<String>> res = new ArrayList<>();
+        for (int hall_id = 1; hall_id <= HALL_ID_MAX; hall_id++) {
+            int row = random.nextInt(4) + 7;
+            int seats = random.nextInt(4) + 7;
+            for (int i = 1; i <= row; i++) {
+                for (int j = 1; j <= seats; j++) {
+                    List<String> cortege = new ArrayList<>();
+                    cortege.add(String.valueOf(hall_id));
+                    cortege.add(String.valueOf(i));
+                    cortege.add(String.valueOf(j));
+                    res.add(cortege);
+                }
+            }
+        }
+        insert(
+                Places,
                 res
         );
     }
