@@ -438,7 +438,7 @@ public class Main implements CreationQuery, Data {
         current = sessions.get(9900).time;
         int ticket_id = 1;
         for (int i = 0; i < sessions.size(); i++) {
-            System.out.println("Session " + i + 1);
+            System.out.println("Session " + i);
             Session session = sessions.get(i);
             LocalDateTime sessionTime;
             boolean was = false;
@@ -527,10 +527,10 @@ public class Main implements CreationQuery, Data {
                 cortage.add(String.valueOf(ticket.getKey().place_id));
                 cortage.add(String.valueOf(ticket.getKey().status_id));
                 cortage.add(String.valueOf(ticket.getKey().session_id));
-                if (ticket.getKey().booking == null) {
+                if (ticket.getKey().booking != null) {
+                    cortage.add(String.valueOf(ticket.getKey().booking));
                     TicketsRes1.add(cortage);
                 } else {
-                    cortage.add(String.valueOf(ticket.getKey().booking));
                     TicketsRes2.add(cortage);
                 }
             }
