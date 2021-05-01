@@ -8,6 +8,7 @@ import tables.Table;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.security.KeyPair;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -133,7 +134,7 @@ public class Main implements CreationQuery, Data {
 
     static void insert_Films() throws IOException {
         List<List<String>> res = new ArrayList<>();
-        LocalDateTime time = LocalDateTime.of(2014,1,1,0,0,1);
+        LocalDateTime time = LocalDateTime.of(2010,1,1,0,0,0);
         Path[] pathsWords = new Path[] {Path.of(RANDOM_PARAMETERS), Path.of(RANDOM_PARAMETERS), Path.of(RANDOM_PARAMETERS)};
         Path[] pathsCountry = new Path[] {Path.of(COUNTRIES)};
         for (int film_id = 1; film_id <= FILM_ID_MAX; film_id++) {
@@ -142,7 +143,7 @@ public class Main implements CreationQuery, Data {
             cortege.add(textField.getRandom());
             cortege.add(String.valueOf(new FieldIntEnum(AGE_RATING).getRandom()));
             cortege.add(textField.getRandom());
-            time = time.plusDays(random.nextInt(2));
+            time = time.plusDays(random.nextInt(10));
             cortege.add(time.toString());
             FieldStringRandom country = new FieldStringRandom(pathsCountry, 100);
             cortege.add(country.getRandom());
@@ -264,14 +265,43 @@ public class Main implements CreationQuery, Data {
 
     static void insert_Sessions() {
         List<List<String>> res = new ArrayList<>();
-        LocalDateTime dateTime = LocalDateTime.of(LocalDate.of(2014, 1, 1), LocalTime.of(0, 0, 1));
-        for (int session_id = 1; session_id <= SESSIONS_ID_MAX; session_id++) {
-            //Date d = new Time(1,1,1).toInstant();
+        List<LocalDateTime> hallsPerTime = new ArrayList<>(HALL_ID_MAX);
+        for (int i = 0; i < HALL_ID_MAX; i++) {
+            hallsPerTime.add(LocalDateTime.of(
+                    LocalDate.of(2010, 2, 1),
+                    LocalTime.of(0, 0, 0)));
+        }
+        int session_id = 1;
+        while (session_id < 10000) {
+            for (int i = 0; i < HALL_ID_MAX; i++) {
+                Film d;
+                if ((d = getLastAccepted(hallsPerTime.get(i))) != null) {
+                    List<String> cortege = new ArrayList<>();
+                    cortege.add(String.valueOf(i + 1));
+                    cortege.add(String.valueOf(d.id));
+                    cortege.add(String.valueOf(random.nextInt(1000) + 1));
+                    cortege.add(String.valueOf(hallsPerTime.get(i)));
+                    hallsPerTime.get(i).plus(d.time);
+                    hallsPerTime.get(i).plusHours(random.nextInt(2) + 1);
+
+                    session_id++;
+                } else {
+                    hallsPerTime.get(i).plusDays(1);
+                }
+            }
+            System.out.println("session_id = " + session_id);
         }
         insert(
                 Sessions,
                 res
         );
+    }
+
+    static Film getLastAccepted(LocalDateTime time) {
+        return films.stream()
+                .filter(x -> x.date.isBefore(time))
+                .reduce((s1, s2) -> s2)
+                .orElse(null);
     }
 
 
