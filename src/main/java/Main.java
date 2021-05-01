@@ -6,6 +6,7 @@ import providers.fields.FieldStringLimited;
 import providers.fields.FieldStringRandom;
 import tables.Table;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.KeyPair;
@@ -316,9 +317,6 @@ public class Main implements CreationQuery, Data {
                     cortege.add(String.valueOf(d.id));
                     cortege.add(String.valueOf(random.nextInt(1000) + 1));
                     cortege.add(String.valueOf(hallsPerTime.get(i)));
-                    if (i == 9900) {
-                        current = hallsPerTime.get(i);
-                    }
                     Session session = new Session(i + 1, hallsPerTime.get(i), films.get(d.id - 1));
                     System.out.println(session.toString());
                     sessions.add(session);
@@ -390,12 +388,57 @@ public class Main implements CreationQuery, Data {
      * 6 Not Used
      */
 
+    static class MyKeyValueHolder<K, V> implements Map.Entry<K, V> {
+
+        final K key;
+
+        V value;
+
+        MyKeyValueHolder(K k, V v) {
+            this.key = Objects.requireNonNull(k);
+            this.value = Objects.requireNonNull(v);
+        }
+
+        public K getKey() {
+            return this.key;
+        }
+
+        public V getValue() {
+            return this.value;
+        }
+
+        public V setValue(V value) {
+            V tmp = this.value;
+            this.value = value;
+            return tmp;
+        }
+
+        public boolean equals(Object o) {
+            if (!(o instanceof Map.Entry)) {
+                return false;
+            } else {
+                Map.Entry<?, ?> e = (Map.Entry)o;
+                return this.key.equals(e.getKey()) && this.value.equals(e.getValue());
+            }
+        }
+
+        public int hashCode() {
+            return this.key.hashCode() ^ this.value.hashCode();
+        }
+
+        public String toString() {
+            return this.key + "=" + this.value;
+        }
+    }
+
     static void insert_Tickets_Logs() {
         List<List<String>> TicketsRes1 = new ArrayList<>();
         List<List<String>> TicketsRes2 = new ArrayList<>();
         List<List<String>> LogsRes = new ArrayList<>();
+        current = sessions.get(9900).time;
         int ticket_id = 1;
         for (int i = 0; i < sessions.size(); i++) {
+            System.out.println("Session " + i + 1);
             Session session = sessions.get(i);
             LocalDateTime sessionTime;
             boolean was = false;
@@ -407,14 +450,14 @@ public class Main implements CreationQuery, Data {
                 was = false;
                 sessionTime = current;
             }
-            List<Map.Entry<Ticket,LocalDateTime>> ticketsAndTimePerSession = new ArrayList<>();
+            List<MyKeyValueHolder<Ticket,LocalDateTime>> ticketsAndTimePerSession = new ArrayList<>();
             List<Log> logPerSession = new ArrayList<>();
             int minusMinutes = random.nextInt(24 * 7 * 60) + 24 * 60;
             LocalDateTime addTime = sessionTime.minusMinutes(minusMinutes);
             for (int place_id : getPlaces(session.hall_id)) {
                 if (getPercent(98)) {
                     Ticket ticket = new Ticket(ticket_id++, place_id, 1, i + 1, null);
-                    ticketsAndTimePerSession.add(Map.entry(ticket, addTime));
+                    ticketsAndTimePerSession.add(new MyKeyValueHolder(ticket, addTime));
                     logPerSession.add(new Log(ticket.ticket_id, ticket.status_id, addTime));
                 }
             }
