@@ -59,7 +59,8 @@ public interface CreationQuery {
                     "hall_id INT, " +
                     "film_id INT," +
                     "newsreel_id INT, " +
-                    "time DATETIME, " +
+                    "time TIME, " +
+                    "date DATE, " +
                     "FOREIGN KEY (hall_id)  REFERENCES Halls(hall_id)," +
                     "FOREIGN KEY (film_id)  REFERENCES Films(film_id)," +
                     "FOREIGN KEY (newsreel_id)  REFERENCES Newsreels(newsreel_id))",

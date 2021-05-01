@@ -63,7 +63,7 @@ public interface Data {
 
     Table Sessions = new Table(
             "Sessions",
-            new String[] {"hall_id", "film_id", "newsreel_id", "time"});
+            new String[] {"hall_id", "film_id", "newsreel_id", "time", "date"});
 
     Table Tickets = new Table(
             "Tickets",
