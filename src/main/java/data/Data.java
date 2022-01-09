@@ -36,7 +36,7 @@ public interface Data {
 
     Table Places = new Table(
             "Places",
-            new String[] {"hall_id", "row", "seat"});
+            new String[] {"hall_id", "_row", "seat"});
 
     Table Films = new Table(
             "Films",
@@ -77,9 +77,9 @@ public interface Data {
             "Logs",
             new String[] {"ticket_id", "status_id", "change_time"});
 
-    String url = "jdbc:mysql://localhost/cinema";
+    String url = "jdbc:mysql://localhost:3306/cinema";
     String username = "root";
-    String password = "After1901";
+    String password = "root";
 
 }
 

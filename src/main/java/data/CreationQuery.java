@@ -14,7 +14,7 @@ public interface CreationQuery {
             "CREATE TABLE Places (" +
                     "place_id INT PRIMARY KEY AUTO_INCREMENT, " +
                     "hall_id INT, " +
-                    "row SMALLINT," +
+                    "_row SMALLINT," +
                     "seat SMALLINT," +
                     "FOREIGN KEY (hall_id)  REFERENCES Halls (hall_id))",
             "CREATE TABLE Genres (" +

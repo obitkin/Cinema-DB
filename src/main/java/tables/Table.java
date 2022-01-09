@@ -12,9 +12,9 @@ public class Table {
     public String tableName;
     public String[] columnsNames;
 
-    static String url = "jdbc:mysql://localhost/cinema";
+    static String url = "jdbc:mysql://localhost:3306/cinema";
     static String username = "root";
-    static String password = "After1901";
+    static String password = "root";
 
     static Connection conn;
 
